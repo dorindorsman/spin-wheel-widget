@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SpinWheelWidget"
 include(":app")
- 
+include(":spinwheel")
