@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             SpinWheelWidgetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "SpinWheel Widget Demo",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -33,8 +33,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
-        modifier = modifier
+        text = name,
+        modifier = modifier,
     )
 }
 
