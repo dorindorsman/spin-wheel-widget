@@ -19,10 +19,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-
-    // חשוב: למחוק את כל הבלוק הזה:
-    // versionCatalogs { create("libs") { from(...) } }
-    // Gradle טוען אוטומטית את gradle/libs.versions.toml
 }
 
 rootProject.name = "SpinWheelWidget"

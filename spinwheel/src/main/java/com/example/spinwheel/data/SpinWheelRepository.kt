@@ -52,9 +52,16 @@ class SpinWheelRepository(
     }
 
     private fun joinUrl(host: String, path: String): String {
-        val h = if (host.endsWith("/")) host else "$host/"
-        val p = if (path.startsWith("/")) path.drop(1) else path
-        return h + p
+        val cleanHost = host.trim()
+        val cleanPath = path.trimStart('/')
+
+        return if (cleanHost.endsWith("=")) {
+            // Google Drive style host (id=)
+            cleanHost + cleanPath
+        } else {
+            // Regular host/path
+            cleanHost.trimEnd('/') + "/" + cleanPath
+        }
     }
 
     private fun parseConfig(raw: String): RootConfig =
