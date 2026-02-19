@@ -1,32 +1,27 @@
 package com.example.spinwheel.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
-import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import com.example.spinwheel.SpinWheelSdk
-import com.example.spinwheel.config.SpinWheelConstants
 import com.example.spinwheel.widget.ui.SpinWheelWidget
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.spinwheel.worker.SpinWheelWarmup
 
 class SpinWheelWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override val glanceAppWidget: GlanceAppWidget = SpinWheelWidget()
 
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        SpinWheelWarmup.enqueue(context.applicationContext)
+    }
+
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                SpinWheelSdk.refresh(
-                    context = context.applicationContext,
-                    configUrl = SpinWheelConstants.CONFIG_URL
-                )
-            } catch (t: Throwable) {
-                Log.e("SPIN_DEBUG", "Widget initial refresh failed", t)
-            }
-        }
+        SpinWheelWarmup.enqueue(context.applicationContext)
     }
 }

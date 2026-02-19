@@ -1,5 +1,6 @@
 package com.example.spinwheel.data
 
+import android.util.Log
 import com.example.spinwheel.model.RootConfig
 import com.example.spinwheel.model.WidgetConfig
 import com.example.spinwheel.prefs.SpinWheelPrefs
@@ -46,22 +47,26 @@ class SpinWheelRepository(
     }
 
     private fun downloadAssetIfMissing(localFileName: String, url: String) {
-        if (cache.hasAsset(localFileName)) return
+        if (cache.hasAsset(localFileName)) {
+            Log.d("SPIN_DEBUG", "asset exists: $localFileName")
+            return
+        }
+        Log.d("SPIN_DEBUG", "downloading asset: $localFileName from $url")
         val bytes = api.fetchBytes(url)
         cache.writeAsset(localFileName, bytes)
     }
 
     private fun joinUrl(host: String, path: String): String {
-        val cleanHost = host.trim()
-        val cleanPath = path.trimStart('/')
+        val h = host.trim()
+        val p = path.trim().trimStart('/')
 
-        return if (cleanHost.endsWith("=")) {
-            // Google Drive style host (id=)
-            cleanHost + cleanPath
-        } else {
-            // Regular host/path
-            cleanHost.trimEnd('/') + "/" + cleanPath
+        val gdrive = h.contains("drive.google.com/uc") && h.contains("id=")
+        if (gdrive) {
+            val base = h.replace("id=/", "id=").replace("id=//", "id=")
+            return base + p
         }
+
+        return h.trimEnd('/') + "/" + p
     }
 
     private fun parseConfig(raw: String): RootConfig =
@@ -74,5 +79,11 @@ class SpinWheelRepository(
 
         val ageMs = System.currentTimeMillis() - prefs.getLastConfigFetchTimeMillis()
         return ageMs < expirationSec * 1000L
+    }
+
+    fun isCacheStillValidFromDisk(): Boolean {
+        val cached = cache.readConfigOrNull() ?: return false
+        val parsed = parseConfig(cached)
+        return isCacheValid(parsed)
     }
 }
